@@ -7,43 +7,61 @@ import {
 
 import PhoneInput from "react-phone-number-input/input";
 import en from "react-phone-number-input/locale/en";
+import flags from "react-phone-number-input/flags";
 import ReCAPTCHA from "react-google-recaptcha";
 import { ChevronDown } from "lucide-react";
-import {
-  ToastContainer,
-  toast,
-} from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "react-phone-number-input/style.css";
 
 /* =========================================================
-   COUNTRY SELECT
+   CUSTOM COUNTRY SELECT
    ========================================================= */
 
 const CountrySelect = ({ value, onChange }) => {
-  
-  const countries = getCountries();
+  const selectedCountry = value || "IN";
+  const Flag = flags[selectedCountry];
 
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="h-[36px] w-full rounded-[9px] border border-[#e0e4e8] bg-white px-2 text-[12px] text-[#026CC0] outline-none focus:border-[#69b99e]"
-    >
-      {countries.map((country) => (
-        <option key={country} value={country}>
-          {en[country] || country}
-        </option>
-      ))}
-    </select>
+    <div className="relative h-full w-full">
+      <select
+        value={selectedCountry}
+        onChange={(e) => onChange(e.target.value)}
+        aria-label="Select country"
+        className="absolute inset-0 z-20 h-full w-full cursor-pointer appearance-none opacity-0"
+      >
+        {getCountries().map((country) => (
+          <option key={country} value={country}>
+            {en[country]} +{getCountryCallingCode(country)}
+          </option>
+        ))}
+      </select>
+
+      <div className="pointer-events-none flex h-full w-full items-center gap-2 px-3">
+        {Flag && (
+          <Flag
+            title={en[selectedCountry]}
+            className="h-[16px] w-[24px] shrink-0 overflow-hidden rounded-[2px] object-cover"
+          />
+        )}
+
+        <span className="whitespace-nowrap text-[12px] font-medium text-[#333]">
+          +{getCountryCallingCode(selectedCountry)}
+        </span>
+
+        <ChevronDown size={14} className="ml-auto shrink-0 text-[#34506d]" />
+      </div>
+    </div>
   );
 };
 
 /* =========================================================
-    COMPONENT
+   COMPONENT
    ========================================================= */
 
 const Contact = () => {
   const recaptchaRef = useRef(null);
+  const recaptchaSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
   const initialFormData = {
     name: "",
@@ -69,7 +87,6 @@ const Contact = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -97,12 +114,8 @@ const Contact = () => {
 
   const handleCaptchaChange = (token) => {
     setCaptchaToken(token || "");
-
     if (token) {
-      setStatusMessage({
-        type: "",
-        text: "",
-      });
+      setStatusMessage({ type: "", text: "" });
     }
   };
 
@@ -113,40 +126,20 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (isSubmitting) {
-      return;
-    }
+    if (isSubmitting) return;
 
-    setStatusMessage({
-      type: "",
-      text: "",
-    });
+    setStatusMessage({ type: "", text: "" });
 
     /* -------------------------
        VALIDATION
        ------------------------- */
 
     const requiredFields = [
-      {
-        name: "name",
-        label: "Name",
-      },
-      {
-        name: "email",
-        label: "Email",
-      },
-      {
-        name: "phone",
-        label: "Phone number",
-      },
-      {
-        name: "inquiry",
-        label: "Inquiry type",
-      },
-      {
-        name: "country",
-        label: "Destination country",
-      },
+      { name: "name", label: "Name" },
+      { name: "email", label: "Email" },
+      { name: "phone", label: "Phone number" },
+      { name: "inquiry", label: "Inquiry type" },
+      { name: "country", label: "Destination country" },
     ];
 
     const missingField = requiredFields.find(
@@ -155,14 +148,8 @@ const Contact = () => {
 
     if (missingField) {
       const message = `${missingField.label} is required.`;
-
-      setStatusMessage({
-        type: "error",
-        text: message,
-      });
-
+      setStatusMessage({ type: "error", text: message });
       toast.error(message);
-
       return;
     }
 
@@ -170,19 +157,11 @@ const Contact = () => {
        EMAIL VALIDATION
        ------------------------- */
 
-    const emailRegex =
-      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email.trim())) {
       const message = "Please enter a valid email address.";
-
-      setStatusMessage({
-        type: "error",
-        text: message,
-      });
-
+      setStatusMessage({ type: "error", text: message });
       toast.error(message);
-
       return;
     }
 
@@ -190,19 +169,18 @@ const Contact = () => {
        CAPTCHA VALIDATION
        ------------------------- */
 
-    if (!captchaToken) {
-      const message =
-        "Please verify the captcha before submitting.";
+    const tokenFromCaptcha = recaptchaRef.current
+      ? recaptchaRef.current.getValue()
+      : null;
 
-      setStatusMessage({
-        type: "error",
-        text: message,
-      });
-
-      toast.warning(message);
-
+    if (recaptchaSiteKey && !tokenFromCaptcha) {
+      const message = "Please verify the captcha before submitting.";
+      setStatusMessage({ type: "error", text: message });
+      toast.warn(message);
       return;
     }
+
+    setCaptchaToken(tokenFromCaptcha || captchaToken);
 
     /* -------------------------
        START SUBMISSION
@@ -211,155 +189,92 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      /* -------------------------
-         PHONE NUMBER
-         ------------------------- */
+      const callingCode = getCountryCallingCode(formData.phoneCountry);
+      const rawPhone = String(formData.phone || "");
+      const normalizedPhone = rawPhone.replace(/\s|-/g, "");
+      const phoneCode = String(callingCode);
 
-      const callingCode = getCountryCallingCode(
-        formData.phoneCountry
-      );
+      let digitsOnly = normalizedPhone
+        .replace(/^\+/, "")
+        .replace(/\D/g, "");
 
-      let phoneNumber = formData.phone || "";
+      if (digitsOnly.startsWith(phoneCode)) {
+        digitsOnly = digitsOnly.slice(phoneCode.length);
+      }
 
-      // Remove existing country code if PhoneInput
-      // has already included it.
-      phoneNumber = phoneNumber.replace(
-        `+${callingCode}`,
-        ""
-      );
+      const fullPhoneNumber = digitsOnly.length >= 7
+        ? `+${phoneCode}${digitsOnly}`
+        : "";
 
-      const fullPhoneNumber = `+${callingCode}${phoneNumber}`;
-
-      /* -------------------------
-         API PAYLOAD
-         ------------------------- */
+      if (!fullPhoneNumber) {
+        const message = "Please enter a valid phone number.";
+        setStatusMessage({ type: "error", text: message });
+        toast.error(message);
+        return;
+      }
 
       const payload = {
         name: formData.name.trim(),
-
         email: formData.email.trim(),
-
         phone: fullPhoneNumber,
-
-        visaType:
-          formData.inquiry || "General Inquiry",
-
-        message:
-          `[Destination Country: ${
-            formData.country || "Not Specified"
-          }] ${formData.comments || ""}`.trim(),
-
-        captchaToken: captchaToken,
-
+        visaType: formData.inquiry || "General Inquiry",
+        message: `[Destination Country: ${formData.country || "Not Specified"}] ${formData.comments || ""}`.trim(),
+        captchaToken: tokenFromCaptcha || captchaToken,
         source: "Website Hero Form",
       };
 
-      console.log(
-        "Submitting lead:",
-        payload
-      );
+      const apiBaseUrl = "https://global-murex.vercel.app";
 
-      /* -------------------------
-         API REQUEST
-         ------------------------- */
+      const response = await fetch(`${apiBaseUrl}/api/lead`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
 
-      const apiBaseUrl =
-        "https://global-murex.vercel.app";
-
-      const response = await fetch(
-        `${apiBaseUrl}/api/lead`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-
-          body: JSON.stringify(payload),
-        }
-      );
-
-      const responseText =
-        await response.text();
-
-      console.log(
-        "API status:",
-        response.status
-      );
-
-      console.log(
-        "API response:",
-        responseText
-      );
-
+      const responseText = await response.text();
       let result = {};
 
       if (responseText.trim()) {
         try {
           result = JSON.parse(responseText);
         } catch (error) {
-          console.error(
-            "Invalid JSON response:",
-            error
-          );
-
-          const invalidJsonError = new Error(
-            "The server returned an invalid response. Please try again later."
-          );
-          invalidJsonError.cause = error;
-          throw invalidJsonError;
+          throw new Error("The server returned an invalid response. Please try again later.", { cause: error });
         }
       }
 
       /* -------------------------
-         SUCCESS
+         SUCCESS HANDLING
          ------------------------- */
 
-      if (
-        response.ok &&
-        result.success
-      ) {
-        const successMessage =
-          result.message ||
-          "Thank you! Our team will contact you shortly.";
-
-        setStatusMessage({
-          type: "success",
-          text: successMessage,
-        });
-
+      if (response.ok && result.success) {
+        const successMessage = result.message || "Thank you! Our team will contact you shortly.";
+        setStatusMessage({ type: "success", text: successMessage });
         toast.success(successMessage);
 
-        /* Reset form */
+        // Reset form & captcha ref
         setFormData(initialFormData);
-
-        /* Reset CAPTCHA */
         setCaptchaToken("");
+        if (recaptchaRef.current) {
+          recaptchaRef.current.reset();
+        }
       } else {
-        const errorMessage =
-          result.message ||
-          result.error ||
-          `Server error: ${response.status}`;
-
+        const errorMessage = result.message || result.error || `Server error: ${response.status}`;
         throw new Error(errorMessage);
       }
     } catch (error) {
-      console.error(
-        "Form Submission Error:",
-        error
-      );
-
-      const errorMessage =
-        error?.message ||
-        "An error occurred while submitting your request. Please try again later.";
-
-      setStatusMessage({
-        type: "error",
-        text: errorMessage,
-      });
-
+      console.error("Form Submission Error:", error);
+      const errorMessage = error?.message || "An error occurred while submitting. Please try again.";
+      setStatusMessage({ type: "error", text: errorMessage });
       toast.error(errorMessage);
+
+      // Reset Captcha on submission error so user can re-verify
+      setCaptchaToken("");
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -370,215 +285,152 @@ const Contact = () => {
      ========================================================= */
 
   return (
-    <>
+    <div
+      className="w-full min-h-[727px] py-12 flex flex-col items-center justify-center bg-cover bg-center"
+      style={{ backgroundImage: `url(${img})` }}
+    >
+      <h2 className="text-[28px] sm:text-[30px] font-bold text-teal-800 text-center mb-6">
+        Get In Touch With Us
+      </h2>
+
       <div
-        className="w-full h-[727px] mt-2"
+        className="w-full max-w-[456px] rounded-[20px] p-[24px] sm:p-[30px] mx-4"
         style={{
-          backgroundImage: `url(${img})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
+          backgroundColor: "#FFFFFFA8",
+          boxShadow: "0px 0px 24px 4px #B2AFAF40",
+          backdropFilter: "blur(4px)",
         }}
       >
-        <p className="w-[456px] h-[21px] text-[30px] font-bold text-teal-800 ml-160 pt-12">
-          Get In Touch With Us
-        </p>
-
-        {/* FORM */}
-        <div
-          className="w-[456px] h-[460px] rounded-[20px] p-[30px] gap-[16px] mt-20 ml-140"
-          style={{
-            backgroundColor: "#FFFFFFA8",
-            boxShadow:
-              "0px 0px 24px 4px #B2AFAF40",
-            backdropFilter: "blur(4px)",
-          }}
-        >
-          <form
-            onSubmit={handleSubmit}
-            noValidate
-            className="space-y-3"
-          >
-            {/* NAME + EMAIL */}
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <input
-                type="text"
-                name="name"
-                placeholder="Your Name"
-                value={formData.name}
-                onChange={handleChange}
-                className="h-[36px] w-full rounded-[9px] border border-[#e0e4e8] bg-white px-4 text-[12px] text-[#333] outline-none transition placeholder:text-[#026CC0] focus:border-[#69b99e]"
-              />
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Your Email"
-                value={formData.email}
-                onChange={handleChange}
-                className="h-[36px] w-full rounded-[9px] border border-[#e0e4e8] bg-white px-4 text-[12px] text-[#333] outline-none transition placeholder:text-[#026CC0] focus:border-[#69b99e]"
-              />
-            </div>
-
-            {/* PHONE */}
-            <div className="flex w-full gap-2">
-              <div className="h-[36px] w-[115px] shrink-0 rounded-[9px] border border-[#e0e4e8] bg-white sm:w-[120px]">
-                <CountrySelect
-                  value={formData.phoneCountry}
-                  onChange={
-                    handlePhoneCountryChange
-                  }
-                />
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <PhoneInput
-                  country={
-                    formData.phoneCountry
-                  }
-                  value={formData.phone}
-                  onChange={
-                    handlePhoneChange
-                  }
-                  placeholder="Contact Number"
-                  className="phone-number-input h-[36px] w-full rounded-[9px] border border-[#e0e4e8] bg-white px-4 text-[12px] text-[#333] outline-none transition placeholder:text-[#026CC0] focus:border-[#69b99e]"
-                />
-              </div>
-            </div>
-
-            {/* INQUIRY */}
-            <div className="relative">
-              <select
-                name="inquiry"
-                value={formData.inquiry}
-                onChange={handleChange}
-                className="h-[36px] w-full appearance-none rounded-[9px] border border-[#e0e4e8] bg-white px-4 text-[13px] text-[#026CC0] outline-none focus:border-[#69b99e] sm:text-[14px]"
-              >
-                <option value="">
-                  Inquiry for
-                </option>
-
-                <option value="Student Visa">
-                  Student Visa
-                </option>
-
-                <option value="Work Visa">
-                  Work Visa
-                </option>
-
-                <option value="Visitor Visa">
-                  Visitor Visa
-                </option>
-
-                <option value="Migration">
-                  Migration
-                </option>
-              </select>
-
-              <ChevronDown
-                size={15}
-                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#34506d]"
-              />
-            </div>
-
-            {/* COUNTRY */}
-            <div className="relative">
-              <select
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-                className="h-[36px] w-full appearance-none rounded-[9px] border border-[#e0e4e8] bg-white px-4 text-[12px] text-[#026CC0] outline-none focus:border-[#69b99e]"
-              >
-                <option value="">
-                  Country
-                </option>
-
-                <option value="Australia">
-                  Australia
-                </option>
-
-                <option value="New Zealand">
-                  New Zealand
-                </option>
-
-                <option value="Singapore">
-                  Singapore
-                </option>
-
-                <option value="Canada">
-                  Canada
-                </option>
-
-                <option value="United Kingdom">
-                  United Kingdom
-                </option>
-              </select>
-
-              <ChevronDown
-                size={15}
-                className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#34506d]"
-              />
-            </div>
-
-            {/* COMMENTS */}
-            <textarea
-              name="comments"
-              placeholder="Your Comments"
-              value={formData.comments}
+        <form onSubmit={handleSubmit} noValidate className="space-y-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <input
+              type="text"
+              name="name"
+              placeholder="Your Name"
+              value={formData.name}
               onChange={handleChange}
-              rows="2"
-              className="min-h-[70px] w-full resize-none rounded-[10px] border border-[#e0e4e8] bg-white px-4 py-3 text-[12px] text-[#333] outline-none placeholder:text-[#026CC0] focus:border-[#69b99e] sm:min-h-[75px]"
+              required
+              className="h-[36px] w-full rounded-[9px] border border-[#e0e4e8] bg-white px-4 text-[12px] text-[#333] outline-none transition placeholder:text-[#026CC0] focus:border-[#69b99e]"
             />
 
-            {/* RECAPTCHA */}
-            <div className="flex justify-center sm:justify-start">
-              <ReCAPTCHA
-                sitekey={"6LdQnKYtAAAAAJkOhWSSnhScrzUBMtq-k_REKsc3"}
-                ref={recaptchaRef}
-                onChange={handleCaptchaChange}
-                onExpired={() => {
-                  setCaptchaToken("");
-                }}
+            <input
+              type="email"
+              name="email"
+              placeholder="Your Email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="h-[36px] w-full rounded-[9px] border border-[#e0e4e8] bg-white px-4 text-[12px] text-[#333] outline-none transition placeholder:text-[#026CC0] focus:border-[#69b99e]"
+            />
+          </div>
+
+          <div className="flex w-full gap-2">
+            <div className="h-[36px] w-[115px] shrink-0 rounded-[9px] border border-[#e0e4e8] bg-white sm:w-[120px]">
+              <CountrySelect
+                value={formData.phoneCountry}
+                onChange={handlePhoneCountryChange}
               />
             </div>
 
-            {/* STATUS */}
-            {statusMessage.text && (
-              <div
-                className={`text-center text-[12px] font-medium p-2 rounded-md ${
-                  statusMessage.type ===
-                  "success"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
-                }`}
-              >
-                {statusMessage.text}
-              </div>
-            )}
+            <div className="min-w-0 flex-1">
+              <PhoneInput
+                country={formData.phoneCountry}
+                value={formData.phone}
+                onChange={handlePhoneChange}
+                placeholder="Contact Number"
+                required
+                className="phone-number-input h-[36px] w-full rounded-[9px] border border-[#e0e4e8] bg-white px-4 text-[12px] text-[#333] outline-none transition placeholder:text-[#026CC0] focus:border-[#69b99e]"
+              />
+            </div>
+          </div>
 
-            {/* SUBMIT BUTTON */}
+          <div className="relative">
+            <select
+              name="inquiry"
+              value={formData.inquiry}
+              onChange={handleChange}
+              required
+              className="h-[36px] w-full appearance-none rounded-[9px] border border-[#e0e4e8] bg-white px-4 text-[12px] text-[#026CC0] outline-none focus:border-[#69b99e]"
+            >
+              <option value="">Inquiry for</option>
+              <option value="Student Visa">Student Visa</option>
+              <option value="Work Visa">Work Visa</option>
+              <option value="Visitor Visa">Visitor Visa</option>
+              <option value="Migration">Migration</option>
+            </select>
+
+            <ChevronDown
+              size={15}
+              className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#34506d]"
+            />
+          </div>
+
+          <div className="relative">
+            <select
+              name="country"
+              value={formData.country}
+              onChange={handleChange}
+              required
+              className="h-[36px] w-full appearance-none rounded-[9px] border border-[#e0e4e8] bg-white px-4 text-[12px] text-[#026CC0] outline-none focus:border-[#69b99e]"
+            >
+              <option value="">Country</option>
+              <option value="Australia">Australia</option>
+              <option value="New Zealand">New Zealand</option>
+              <option value="Singapore">Singapore</option>
+              <option value="Canada">Canada</option>
+              <option value="United Kingdom">United Kingdom</option>
+            </select>
+
+            <ChevronDown
+              size={15}
+              className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#34506d]"
+            />
+          </div>
+
+          <textarea
+            name="comments"
+            placeholder="Your Comments"
+            value={formData.comments}
+            onChange={handleChange}
+            rows="2"
+            className="min-h-[60px] w-full resize-none rounded-[10px] border border-[#e0e4e8] bg-white px-4 py-2 text-[12px] text-[#333] outline-none placeholder:text-[#026CC0] focus:border-[#69b99e]"
+          />
+
+          <div className="flex justify-center overflow-x-auto py-1">
+            <ReCAPTCHA
+              sitekey={recaptchaSiteKey || "6LdQnKYtAAAAAJkOhWSSnhScrzUBMtq-k_REKsc3"}
+              ref={recaptchaRef}
+              onChange={handleCaptchaChange}
+              onExpired={() => {
+                setCaptchaToken("");
+              }}
+            />
+          </div>
+
+          {statusMessage.text && (
+            <div
+              className={`text-center text-[12px] font-medium p-2 rounded-md ${
+                statusMessage.type === "success"
+                  ? "bg-green-100 text-green-700"
+                  : "bg-red-100 text-red-700"
+              }`}
+            >
+              {statusMessage.text}
+            </div>
+          )}
+
+          <div className="pt-2 flex justify-center">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="mx-auto mt-[-4px] flex h-[42px] w-[140px] items-center justify-center rounded-full bg-[#214c83] text-[14px] font-semibold text-white transition hover:bg-[#163d70] disabled:cursor-not-allowed disabled:opacity-50 sm:h-[45px] sm:w-[150px] xl:mt-[-6px]"
+              className="h-[42px] w-[140px] items-center justify-center rounded-full bg-[#214c83] text-[14px] font-semibold text-white transition  sm:h-[45px] sm:w-[150px]"
             >
-              {isSubmitting
-                ? "Submitting..."
-                : "Submit"}
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
-
-      {/* TOAST CONTAINER */}
-      <ToastContainer
-        position="top-right"
-        autoClose={4000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-      />
-    </>
+    </div>
   );
 };
 
