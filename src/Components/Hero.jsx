@@ -139,6 +139,17 @@ const Hero = () => {
     e.preventDefault();
     setStatusMessage({ type: "", text: "" });
 
+    // Basic client-side validation before sending
+    if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()) {
+      toast.error("Please fill in your name, email and contact number.");
+      return;
+    }
+
+    if (!formData.inquiry.trim() || !formData.country.trim()) {
+      toast.error("Please select an inquiry type and destination country.");
+      return;
+    }
+
     // 1. Validate reCAPTCHA
     const captchaToken = recaptchaRef.current
       ? recaptchaRef.current.getValue()
@@ -197,9 +208,10 @@ const Hero = () => {
       }
 
       if (response.ok && result.success) {
-        toast.success(
-          result.message || "Thank you! Our team will contact you shortly.",
-        );
+        const successMessage =
+          result.message || "Thank you! Our team will contact you shortly.";
+        toast.success(successMessage);
+        setStatusMessage({ type: "success", text: successMessage });
 
         // Reset form & captcha on success
         setFormData(initialFormData);
@@ -209,14 +221,17 @@ const Hero = () => {
       } else {
         const errorMsg =
           result.message || result.error || `Server error: ${response.status}`;
+        toast.error(errorMsg);
+        setStatusMessage({ type: "error", text: errorMsg });
         throw new Error(errorMsg);
       }
     } catch (err) {
       console.error("Form Submission Error:", err);
-      toast.error(
+      const message =
         err.message ||
-          "An error occurred while submitting your request. Please try again later.",
-      );
+        "An error occurred while submitting your request. Please try again later.";
+      toast.error(message);
+      setStatusMessage({ type: "error", text: message });
     } finally {
       setIsSubmitting(false);
     }

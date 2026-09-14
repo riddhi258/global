@@ -19,6 +19,7 @@ import TOEFL from "./Pages/TOEFL.jsx";
 import Duolingo from "./Pages/Duolingo.jsx";
 import Cambridge from "./Pages/Cambridge.jsx";
 import Acadmic from "./Pages/Acadmic.jsx";
+import ContactUs from "./Pages/ContactUs.jsx";
 
 function App() {
   return (
@@ -44,6 +45,7 @@ function App() {
         <Route path="/english-test/duolingo" element={<Duolingo/>} />
         <Route path="/english-test/cambridge-c1-advanced" element={<Cambridge/>} />
         <Route path="/english-test/languagecert-academic" element={<Acadmic/>} />
+        <Route path="/contact" element={<ContactUs/>}/>
       </Routes>
 
       <Footer />
