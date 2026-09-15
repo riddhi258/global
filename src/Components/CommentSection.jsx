@@ -95,7 +95,7 @@ export default function CommentSection() {
         </div>
 
         {/* Comment Form Card */}
-        <div className="w-full lg:w-2/3 bg-[#E6EBDD] rounded-2xl p-8 shadow-sm">
+        <div className="w-full lg:w-2/3 bg-[#E6EBDD] rounded-2xl p-8 shadow-sm mb-20 xl:mb-0">
           <h2 className="text-2xl font-semibold text-[#1E3A3A] mb-4">
             Add a comment
           </h2>

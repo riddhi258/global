@@ -23,7 +23,7 @@ const NewsSection = () => {
   };
 
   return (
-    <section className="bg-white py-20">
+    <section className="bg-white py-20 mb-20">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
         
         {/* BLOG GRID */}
@@ -38,7 +38,7 @@ const NewsSection = () => {
                 alt={blog.title}
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 h-[64px] bg-[#FFFFFF33] px-4 pb-3 pt-12 backdrop-blur-[12px]">
+              <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 h-[74px] bg-[#FFFFFF33] px-4 pb-3 pt-12 backdrop-blur-[12px]">
                 <h3 className="max-w-[280px] text-sm font-semibold leading-5 text-slate-800">
                   {blog.title}
                 </h3>
