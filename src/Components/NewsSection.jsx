@@ -14,6 +14,14 @@ const NewsSection = () => {
 
   const totalPages = Math.ceil(news.length / blogsPerPage);
 
+  const goToPreviousPage = () => {
+    setCurrentPage((page) => (page > 1 ? page - 1 : page));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPage((page) => (page < totalPages ? page + 1 : page));
+  };
+
   return (
     <section className="bg-white py-20">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12">
@@ -51,9 +59,11 @@ const NewsSection = () => {
 
   {/* PREV */}
   <button
-    onClick={() => setCurrentPage((prev) => prev - 1)}
+    type="button"
+    onClick={goToPreviousPage}
     disabled={currentPage === 1}
-    className={`flex h-7 w-7 items-center justify-center rounded-full bg-[#e8f6fb] text-[#69b4d3] transition disabled:cursor-not-allowed disabled:opacity-50 ${
+    aria-label="Previous page"
+    className={`flex h-7 w-7 items-center justify-center rounded-full bg-sky-100 text-cyan-700 font-bold cursor-pointer ${
       currentPage === 1
         ? "text-blue-400 cursor-pointer hover:text-green-500"
         : "text-black hover:text-green-500 cursor-pointer"
@@ -62,15 +72,16 @@ const NewsSection = () => {
     ←
   </button>
 
-  <span className="rounded-full bg-[#f1f8fb] px-3 py-1 text-sm text-[#9bb5c4]">
+  <span className="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-400 text-[18px]">
     {currentPage} / {totalPages}
   </span>
 
   <button
-    onClick={() => setCurrentPage((prev) => prev + 1)}
+    type="button"
+    onClick={goToNextPage}
     disabled={currentPage === totalPages}
     aria-label="Next page"
-    className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e8f6fb] text-[#69b4d3] transition disabled:cursor-not-allowed disabled:opacity-50"
+    className="flex h-7 w-7 items-center justify-center rounded-xl bg-sky-100 text-cyan-700 font-bold"
   >
     →
   </button>
