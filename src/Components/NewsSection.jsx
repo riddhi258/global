@@ -63,7 +63,7 @@ const NewsSection = () => {
     onClick={goToPreviousPage}
     disabled={currentPage === 1}
     aria-label="Previous page"
-    className={`flex h-7 w-7 items-center justify-center rounded-full bg-sky-100 text-cyan-700 font-bold cursor-pointer ${
+    className={`flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-cyan-700 font-bold cursor-pointer ${
       currentPage === 1
         ? "text-blue-400 cursor-pointer hover:text-green-500"
         : "text-black hover:text-green-500 cursor-pointer"
@@ -81,7 +81,7 @@ const NewsSection = () => {
     onClick={goToNextPage}
     disabled={currentPage === totalPages}
     aria-label="Next page"
-    className="flex h-7 w-7 items-center justify-center rounded-xl bg-sky-100 text-cyan-700 font-bold"
+    className="flex h-9 w-9 items-center justify-center rounded-full bg-sky-100 text-cyan-700 font-bold"
   >
     →
   </button>
