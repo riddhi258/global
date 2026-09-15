@@ -31,7 +31,7 @@ const NewsSection = () => {
           {currentBlogs.map((blog) => (
             <div
               key={blog.id}
-              className="group relative h-[270px] w-full max-w-[350px] overflow-hidden rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl"
+              className="group relative h-[270px] w-full max-w-[450px] overflow-hidden rounded-2xl shadow-md transition-all duration-300 hover:shadow-xl"
             >
               <img
                 src={blog.image}
@@ -39,7 +39,7 @@ const NewsSection = () => {
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 h-[64px] bg-[#FFFFFF33] px-4 pb-3 pt-12 backdrop-blur-[12px]">
-                <h3 className="max-w-[260px] text-sm font-semibold leading-5 text-slate-800">
+                <h3 className="max-w-[280px] text-sm font-semibold leading-5 text-slate-800">
                   {blog.title}
                 </h3>
                 <Link

@@ -4,7 +4,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {news } from "../Data/newsData";
 import CommentSection from "../Components/CommentSection";
-import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 
 const NewsArticle = () => {
@@ -108,7 +107,7 @@ const NewsArticle = () => {
           <h1 className="text-[28px] md:text-[32px] font-semibold leading-snug">
             {article.title}
           </h1>
-
+           
         </div>
       </section>
 
@@ -213,7 +212,7 @@ const NewsArticle = () => {
                       href="mailto:info@growmore.one"
                       className="ml-1 text-blue-500 transition-colors"
                     >
-                      info@growmore.one
+                      study@growmore.one
                     </a>
                   </div>
 
@@ -225,7 +224,7 @@ const NewsArticle = () => {
                       href="https://wa.me/61434202021"
                       className="ml-1 text-blue-500 "
                     >
-                      +61 434 202 021
+                      (+61) 43450 5002
                     </a>
                   </div>
 
@@ -237,19 +236,11 @@ const NewsArticle = () => {
                       href="tel:+61387643334"
                       className="ml-1 text-black "
                     >
-                      +61 3 8764 3334
+                     (+91) 9081899668
                     </a>
                   </div>
                 </div>
               </div>
-
-        {/* BUTTON */}
-            <Link to="/book-consultation">
-                <button className="bg-[#5dc2d3] text-white rounded-full hover:bg-black transition px-12 py-4 text-sm font-bold shadow-lg">
-                  Book Consultation →
-                </button>
-              </Link>
-
        <CommentSection/>
       </section>
     </div>
