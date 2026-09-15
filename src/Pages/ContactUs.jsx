@@ -61,7 +61,7 @@ const ContactUs = () => {
         </div>
       </section>
 
-      <section className="relative w-full h-[1780px] overflow-hidden py-12 sm:py-16">
+      <section className="relative w-full overflow-hidden py-10 sm:py-16 xl:mb-[-300px] md:mb-0 lg:mb-0 mb-20">
         <div className="mx-auto w-full max-w-[1256px] px-4 sm:px-8 md:px-12 lg:px-0">
           <div className="mb-10 flex flex-col items-center text-center md:items-start md:text-left">
             <p className="text-[28px] leading-none lg:ml-80 xl:ml-110 text-[#4298A9] sm:text-[34px] md:text-[40px]">
@@ -80,37 +80,37 @@ const ContactUs = () => {
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="flex h-[64px] items-center gap-3 rounded-[10px] bg-slate-100 px-[20px] py-[14px]">
+                  <div className="flex h-auto min-h-[64px] items-center gap-3 rounded-[10px] bg-slate-100 px-[20px] py-[14px] lg:h-[64px]">
                     <img src={call} alt="Call icon" className="h-[30px] w-[30px]" />
                     <div className="ml-3 flex flex-col">
-                      <p className="text-[16px] font-semibold text-cyan-600">Requesting A Call</p>
-                      <p className="mt-3 text-[16px] font-semibold text-cyan-600">{office.requestCall}</p>
+                      <p className="text-[16px] mt-1 font-semibold text-cyan-600">Requesting A Call</p>
+                      <p className="text-[16px] font-semibold text-cyan-600">{office.requestCall}</p>
                     </div>
                   </div>
 
-                  <div className="flex h-[64px] items-center gap-3 rounded-[10px] bg-slate-100 px-[20px] py-[14px]">
+                  <div className="flex h-auto min-h-[64px] items-center gap-3 rounded-[10px] bg-slate-100 px-[20px] py-[14px] lg:h-[64px]">
                     <img src={whatsapp} alt="whatsapp icon" className="h-[30px] w-[30px]" />
                     <div className="ml-3 flex flex-col">
-                      <p className="text-[16px] font-semibold text-cyan-600">WhatsApp</p>
-                      <p className="mt-3 text-[16px] font-semibold text-cyan-600">{office.whatsapp}</p>
+                      <p className="text-[16px] mt-1 font-semibold text-cyan-600">WhatsApp</p>
+                      <p className="text-[16px] font-semibold text-cyan-600">{office.whatsapp}</p>
                     </div>
                   </div>
                 </div>
 
                 <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <div className="flex h-[64px] items-center gap-3 rounded-[10px] bg-slate-100 px-[20px] py-[14px]">
+                  <div className="flex h-auto min-h-[64px] items-center gap-3 rounded-[10px] bg-slate-100 px-[20px] py-[14px] lg:h-[64px]">
                     <img src={email} alt="email icon" className="h-[30px] w-[30px]" />
                     <div className="ml-3 flex flex-col">
-                      <p className="text-[16px] font-semibold text-cyan-600">Email</p>
-                      <p className="mt-3 text-[16px] font-semibold text-cyan-600">{office.email}</p>
+                      <p className="text-[16px] mt-1 font-semibold text-cyan-600">Email</p>
+                      <p className=" text-[16px] font-semibold text-cyan-600">{office.email}</p>
                     </div>
                   </div>
 
-                  <div className="flex h-[64px] items-center gap-3 rounded-[10px] bg-slate-100 px-[20px] py-[14px]">
+                  <div className="flex h-auto min-h-[64px] items-center gap-3 rounded-[10px] bg-slate-100 px-[20px] py-[14px] lg:h-[64px]">
                     <img src={clock} alt="clock icon" className="h-[30px] w-[30px]" />
                     <div className="ml-3 flex flex-col">
-                      <p className="text-[16px] font-semibold text-cyan-600">{office.hoursLabel}</p>
-                      <p className="mt-3 text-[16px] font-semibold text-cyan-600">{office.hours}</p>
+                      <p className="text-[16px] mt-1 font-semibold text-cyan-600">{office.hoursLabel}</p>
+                      <p className=" text-[16px] font-semibold text-cyan-600">{office.hours}</p>
                     </div>
                   </div>
                 </div>
@@ -119,7 +119,7 @@ const ContactUs = () => {
                   <img src={location} alt="location icon" className="h-[30px] w-[30px]" />
                   <div className="ml-3 flex flex-col">
                     <p className="text-[16px] font-semibold text-cyan-600">Location</p>
-                    <p className="mt-3 text-[16px] font-semibold text-cyan-600">{office.address}</p>
+                    <p className="mt-2 text-[16px] font-semibold text-cyan-600 xl:w-[404px]">{office.address}</p>
                   </div>
                 </div>
 

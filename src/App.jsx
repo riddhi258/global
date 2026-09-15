@@ -20,6 +20,8 @@ import Duolingo from "./Pages/Duolingo.jsx";
 import Cambridge from "./Pages/Cambridge.jsx";
 import Acadmic from "./Pages/Acadmic.jsx";
 import ContactUs from "./Pages/ContactUs.jsx";
+import News from "./Pages/News.jsx";
+import NewsArticle from "./Pages/NewsArtical.jsx";
 
 function App() {
   return (
@@ -37,6 +39,9 @@ function App() {
         <Route path="/services/student-visa" element={<Student />} />
 
         <Route path="/latest-update/videos" element={<Videos />} />
+        <Route path="/latest-update/news" element={<News/>} />
+        <Route path="/news/:slug/" element={<NewsArticle />} />
+
 
         <Route path="/english-test" element={<English />} />
         <Route path="/english-test/ielts" element={<Ielts />} />

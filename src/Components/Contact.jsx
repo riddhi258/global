@@ -286,15 +286,15 @@ const Contact = () => {
 
   return (
     <div
-      className="w-full min-h-[727px] lg:h-[900px] py-12 px-4 flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat sm:px-6"
+      className="w-full min-h-[727px] md:min-h-[900px] lg:min-h-[900px]  py-12 px-4 flex flex-col items-center justify-center bg-cover bg-center bg-no-repeat sm:px-6"
       style={{ backgroundImage: `url(${img})` }}
     >
-      <h2 className="text-[28px] sm:text-[30px] font-bold text-teal-800 text-center mb-6 mt-[-80px]">
+      <h2 className="text-[24px] sm:text-[30px] font-bold text-teal-800 text-center mb-4 mt-0 sm:mb-6 sm:mt-[-80px]">
         Get In Touch With Us
       </h2>
 
       <div
-        className="w-full max-w-[456px] rounded-[20px] p-[24px] sm:p-[30px] mx-auto mb-10  mt-4"
+        className="w-full max-w-[456px] rounded-[20px] p-[16px] sm:p-[30px] mx-auto mb-10 mt-4"
         style={{
           backgroundColor: "#FFFFFFA8",
           boxShadow: "0px 0px 24px 4px #B2AFAF40",
