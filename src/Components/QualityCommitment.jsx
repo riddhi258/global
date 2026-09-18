@@ -225,7 +225,7 @@ const QualityCommitment = () => {
               md:h-[195px]
               md:w-[180px]
 
-              lg:left-[50px]
+              lg:left-[70px]
 
               xl:absolute
               xl:left-[50px]
@@ -295,7 +295,7 @@ const QualityCommitment = () => {
               md:-translate-x-1/2
 
               lg:absolute
-              lg:left-[275px]
+              lg:left-[300px]
               lg:top-[132px]
               lg:h-[260px]
               lg:w-[420px]
@@ -470,7 +470,7 @@ const QualityCommitment = () => {
               md:h-[195px]
               md:w-[180px]
               
-              lg:left-[700px]
+              lg:left-[690px]
               xl:absolute
               xl:left-[950px]
               xl:right-auto

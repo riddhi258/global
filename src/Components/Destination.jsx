@@ -57,7 +57,7 @@ const Destination = () => {
   }, []);
 
   return (
-    <section className="w-full bg-white py-16 md:py-20 lg:py-[70px]">
+    <section className="w-full bg-white py-16 md:py-20 lg:ml-8 xl:ml-0 lg:py-[70px]">
       <div className="mx-auto w-full max-w-[1350px] px-5 sm:px-8 lg:px-0">
 
         {/* Heading */}
